@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mindfeed
+      POSTGRES_USER: mindfeed
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mindfeed-local-change-me}
+    volumes:
+      - mindfeed_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mindfeed -d mindfeed"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      SECRET_KEY: ${SECRET_KEY:-local-compose-only-change-before-public-deployment}
+      DATABASE_URL: postgresql+psycopg://mindfeed:${POSTGRES_PASSWORD:-mindfeed-local-change-me}@db:5432/mindfeed
+      ENABLE_DEMO_LOGIN: ${ENABLE_DEMO_LOGIN:-true}
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:8000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8000}
+    ports:
+      - "8000:8000"
+
+volumes:
+  mindfeed_pgdata:

@@ -1,0 +1,18 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.db
+*.sqlite
+*.sqlite3
+node_modules/
+frontend/node_modules/
+frontend/dist/assets/
+frontend/dist/*.map
+*.log
+.DS_Store
+# User-uploaded media is runtime data; do not commit it.
+uploads/*
+!uploads/.gitkeep
